@@ -1,6 +1,6 @@
 # ffmpeg-trim-wrapper
 
-A lightweight PowerShell GUI that trims audio and video files using `ffmpeg.exe`.  
+A lightweight PowerShell GUI for trimming audio and video using a bundled prebuilt ffmpeg.exe.
 Adds a right-click “Trim with ffmpeg” option to the context menu for common media formats.
 
 - Lets you overwrite the original or save the trimmed file as a copy  
