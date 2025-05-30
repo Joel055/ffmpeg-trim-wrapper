@@ -6,21 +6,15 @@ Adds a right-click “Trim with ffmpeg” option to the context menu for common 
 - Lets you overwrite the original or save the trimmed file as a copy  
 - Supports: `.mp4`, `.mkv`, `.webm`, `.mp3`, `.flac`, and more
 
----
-
 ## Install
 
 1. Clone/download the repo  
 2. Run `install.ps1` as administrator  
 
----
-
 ## Uninstall
 
 Run `uninst.bat` (admin) from the installed folder:  
 `%LOCALAPPDATA%\ffmpeg-trim-wrappe`
-
----
 
 ## Licensing
 
