@@ -1,4 +1,5 @@
 Add-Type -AssemblyName System.Windows.Forms
+[System.Windows.Forms.Application]::EnableVisualStyles()
 
 function ToggleUIState {
     $box.SuspendLayout()
