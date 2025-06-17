@@ -11,7 +11,7 @@ if (-Not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administra
 }
 
 $dir = "$Env:LOCALAPPDATA\ffmpeg-trim-wrapper"
-$cmd = "powershell.exe -Command `"Start-Process -WindowStyle Hidden powershell -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File `"$dir\trim-ui.ps1`" `"%1`"'`""
+$cmd = 'powershell.exe -Command "Start-Process -WindowStyle Hidden powershell -ArgumentList ''-NoProfile -ExecutionPolicy Bypass -File \"' + "$dir\trim-ui.ps1" + '\" \"%1%\"''"'
 $icon = "%SystemRoot%\System32\shell32.dll,041" 
 $mediaExts = @(
     ".mp4",
