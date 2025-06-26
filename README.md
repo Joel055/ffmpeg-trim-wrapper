@@ -9,7 +9,7 @@ Adds a right-click “Trim with ffmpeg” option to the context menu for common 
 
 ## Install
 
-1. Clone/download the repo  
+1. Clone or download the repo, or grab the latest release package.
 2. Run `install.ps1` as administrator  
 
 ## Uninstall
