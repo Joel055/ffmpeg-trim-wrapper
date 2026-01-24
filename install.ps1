@@ -10,6 +10,30 @@ if (-Not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administra
     exit 0
 }
 
+if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
+    $dwn = Read-Host "`nffmpeg not found, install binary from winget(Y/N)"
+
+    if ($dwn.ToLower() -eq "y"){
+        if (-not (Get-Command winget -ErrorAction SilentlyContinue)){
+            Write-Host "`nERROR: Winget not found, install ffmpeg manually." -ForegroundColor DarkRed
+            exit 0
+        }
+        
+        try {
+            Write-Host "`nDownloading and installing ffmpeg..." -ForegroundColor Cyan
+            winget.exe install --id "Gyan.FFmpeg.Essentials" --exact --accept-package-agreements --accept-source-agreements | Out-Null
+        }
+        catch {
+            Write-Host "`nffmpeg installation failed." -ForegroundColor Red
+            exit 0
+        }
+    }
+    else {
+        Write-Host "Install ffmpeg manually, and re-run the install-file." -ForegroundColor DarkRed
+        exit 0
+    }
+}
+
 $dir = "$Env:LOCALAPPDATA\ffmpeg-trim-wrapper"
 $cmd = 'powershell.exe -Command "Start-Process -WindowStyle Hidden powershell -ArgumentList ''-NoProfile -ExecutionPolicy Bypass -File \"' + "$dir\trim-ui.ps1" + '\" \"%1%\"''"'
 $icon = "%SystemRoot%\System32\shell32.dll,041" 

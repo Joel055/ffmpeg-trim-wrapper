@@ -20,8 +20,9 @@ function ToggleUIState {
     $box.Refresh()
 }
 
-$Env:Path = "$Env:LOCALAPPDATA\ffmpeg-trim-wrapper;" + $Env:Path
+$Env:Path  = "$Env:LOCALAPPDATA\ffmpeg-trim-wrapper;" + $Env:Path
 $inputPath = $args[0]
+$ffmpeg    = (Get-Command ffmpeg).Source
 
 $box = New-Object System.Windows.Forms.Form -Property @{
     Text            = "Trim"
@@ -156,7 +157,7 @@ $ui.buttonT.Add_Click({
         return
     }
     
-    ffmpeg -y -ss $start -to $stop -i "$($inputPath)" -c copy $tmpPath
+    &$ffmpeg -y -ss $start -to $stop -i "$($inputPath)" -c copy $tmpPath
 
     if ($LASTEXITCODE -eq 0) {
         if ($ui.radioA.Checked) {

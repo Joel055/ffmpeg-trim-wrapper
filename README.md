@@ -19,21 +19,9 @@ Run `uninst.bat` (admin) from the installed folder:
 
 ## Licensing
 
-This project includes an unmodified `ffmpeg.exe` binary from [BtbN/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds),  
-specifically from the archive: [`ffmpeg-N-119683-ga18b2c2696-win64-lgpl.zip`](https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2025-05-24-14-00/ffmpeg-N-119683-ga18b2c2696-win64-lgpl.zip)
-
-**SHA-256 of the included `ffmpeg.exe`:**
-
-    659A992EFD6A0EE7F3F5EDF4A5B64992D585B301EEB0E82A37FEE705402D8514
-
-**To verify it yourself, run:**
-
-    Get-FileHash .\ffmpeg.exe -Algorithm SHA256
+This project utilizes an already installed ffmpeg instance, or downloads it from winget.
 
 **Licenses:**
 
 - `ffmpeg.exe` is licensed under the LGPL v2.1 — see [`COPYING.LGPLv2.1`](COPYING.LGPLv2.1)  
 - All other scripts are licensed under the MIT License — see [`LICENSE`](LICENSE)
-
-
-  
