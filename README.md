@@ -23,5 +23,5 @@ This project utilizes an already installed ffmpeg instance, or downloads it from
 
 **Licenses:**
 
-- `ffmpeg.exe` is licensed under the LGPL v2.1 — see [`COPYING.LGPLv2.1`](COPYING.LGPLv2.1)  
+- ffmpeg is licensed under the LGPL v2.1 — see [`COPYING.LGPLv2.1`](COPYING.LGPLv2.1)  
 - All other scripts are licensed under the MIT License — see [`LICENSE`](LICENSE)
