@@ -71,7 +71,7 @@ foreach ($ext in $mediaExts) {
     New-ItemProperty -Path $ctxPath -Name "Icon" -Value $icon -PropertyType String | Out-Null
 }
 
-Write-Host "`n`Installation complete."
+Write-Host "`nInstallation complete."
 taskkill /f /im explorer.exe | Out-Null
 Start-Process explorer
 Start-Sleep -Seconds 3

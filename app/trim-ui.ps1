@@ -4,16 +4,25 @@ Add-Type -AssemblyName System.Windows.Forms
 function ToggleUIState {
     $box.SuspendLayout()
 
+    $disable = $ui.buttonT.Enabled
+
     foreach ($key in $ui.Keys) {
         if ($key -notmatch '^(label|colon|group)') {
-            $ui[$key].Enabled = -not $ui[$key].Enabled
+            $ui[$key].Enabled = -not $disable
         }
     }
 
-    $box.Cursor = if ($box.Cursor -eq [System.Windows.Forms.Cursors]::WaitCursor) {
-        [System.Windows.Forms.Cursors]::Default
-    } else {
+    if (-not $disable -and $ui.checkA.Checked) {
+        $ui.boxH2.Enabled = $false
+        $ui.boxM2.Enabled = $false
+        $ui.boxS2.Enabled = $false
+    }
+
+    $box.Cursor = if ($disable) {
         [System.Windows.Forms.Cursors]::WaitCursor
+    }
+    else {
+        [System.Windows.Forms.Cursors]::Default
     }
 
     $box.ResumeLayout($true)
@@ -23,11 +32,14 @@ function ToggleUIState {
 $Env:Path  = "$Env:LOCALAPPDATA\ffmpeg-trim-wrapper;" + $Env:Path
 $inputPath = $args[0]
 $ffmpeg    = (Get-Command ffmpeg).Source
+$ffprobe   = (Get-Command ffprobe).Source
+$duration = &$ffprobe -loglevel error -show_entries format=duration `
+    -of default=noprint_wrappers=1:nokey=1 "$inputPath"
 
 $box = New-Object System.Windows.Forms.Form -Property @{
     Text            = "Trim"
     Font            = New-Object System.Drawing.Font("Microsoft Sans Serif", 10)
-    ClientSize      = New-Object System.Drawing.Size(246,228)
+    ClientSize      = New-Object System.Drawing.Size(246,252)
     ShowInTaskBar   = $false
     HelpButton      = $true
     MinimizeBox     = $false
@@ -60,10 +72,11 @@ $controls = @{
     boxH2   = @{ Type = "TextBox"; Text = "00"; TextAlign = "Center"; Location = @{ X = 70; Y = 55 }; Width = 36; TabIndex = 4 }
     boxM2   = @{ Type = "TextBox"; Text = "00"; TextAlign = "Center"; Location = @{ X = 130; Y = 55 }; Width = 36; TabIndex = 5 }
     boxS2   = @{ Type = "TextBox"; Text = "00"; TextAlign = "Center"; Location = @{ X = 190; Y = 55 }; Width = 36; TabIndex = 6 }
-    groupO  = @{ Type = "GroupBox"; Text = "Output"; Location = @{ X = 20; Y = 95 }; Size = @{ Width = 206; Height = 70 }}
+    checkA  = @{ Type = "CheckBox"; Text = "Trim until end"; Location = @{ X = 71; Y = 87 }; AutoSize = $true; Checked = $false }  #Trim until end
+    groupO  = @{ Type = "GroupBox"; Text = "Output"; Location = @{ X = 20; Y = 121 }; Size = @{ Width = 206; Height = 70 }}
     radioA  = @{ Type = "RadioButton"; Text = "Overwrite original"; Location = @{ X = 10; Y = 20 }; AutoSize = $true; Parent = "groupO"}
     radioB  = @{ Type = "RadioButton"; Text = "Save as new file"; Location = @{ X = 10; Y = 40 }; AutoSize = $true; Parent = "groupO"; Checked = $true }
-    buttonT = @{ Type = "Button"; Text = "Trim"; Location = @{ X = 164; Y = 186 }; Width = 60; TabIndex = 9 }
+    buttonT = @{ Type = "Button"; Text = "Trim"; Location = @{ X = 164; Y = 210 }; Width = 60; TabIndex = 9 }
 }
 
 # Store instantiated controls for reference
@@ -135,6 +148,33 @@ foreach ($name in $ui.Keys) {
     }
 }
 
+# Click event for checkbox, autofill video duration
+$ui.checkA.Add_CheckedChanged({
+    $useFullDuration = $ui.checkA.Checked
+    
+    if ($useFullDuration) {
+        $totalSeconds = [int][math]::Floor($duration)
+
+        $hours   = [int][math]::Floor($totalSeconds / 3600)
+        $minutes = [int][math]::Floor(($totalSeconds % 3600) / 60)
+        $seconds = [int]($totalSeconds % 60)
+
+        $ui.boxH2.Text = "{0:D2}" -f $hours
+        $ui.boxM2.Text = "{0:D2}" -f $minutes
+        $ui.boxS2.Text = "{0:D2}" -f $seconds
+    }
+    else {
+        $ui.boxH2.Text = "00"
+        $ui.boxM2.Text = "00"
+        $ui.boxS2.Text = "00"
+    }
+
+    $ui.boxH2.Enabled  = -not $useFullDuration
+    $ui.boxM2.Enabled  = -not $useFullDuration
+    $ui.boxS2.Enabled  = -not $useFullDuration
+
+}.GetNewClosure())
+
 # Click event for Trim button
 $ui.buttonT.Add_Click({
     ToggleUIState
@@ -158,13 +198,13 @@ $ui.buttonT.Add_Click({
     }
     
     &$ffmpeg -y -ss $start -to $stop -i "$($inputPath)" -c copy $tmpPath
-
+    
     if ($LASTEXITCODE -eq 0) {
         if ($ui.radioA.Checked) {
             Move-Item -Force $tmpPath $inputPath
         }
         else {
-            $timestamp = Get-Date -Format "_HH.mm.s"
+            $timestamp = Get-Date -Format "_HH.mm.ss"
 
             $directory  = [IO.Path]::GetDirectoryName($inputPath)
             $basename   = [IO.Path]::GetFileNameWithoutExtension($inputPath)
