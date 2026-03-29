@@ -197,11 +197,14 @@ $ui.buttonT.Add_Click({
         return
     }
     
+    # Extend stop by 1s to include trailing fractional seconds
+    $stop = $tStop.Add([TimeSpan]::FromSeconds(1)).ToString("hh\:mm\:ss")
+
     &$ffmpeg -y -ss $start -to $stop -i "$($inputPath)" -c copy $tmpPath
     
     if ($LASTEXITCODE -eq 0) {
         if ($ui.radioA.Checked) {
-            Move-Item -Force $tmpPath $inputPath
+            Move-Item -LiteralPath $tmpPath -Destination $inputPath -Force
         }
         else {
             $timestamp = Get-Date -Format "_HH.mm.ss"
@@ -213,7 +216,7 @@ $ui.buttonT.Add_Click({
             $newFilename     = "$basename$timestamp$extension"
             $destinationPath = Join-Path $directory $newFilename
 
-            Move-Item -Force $tmpPath $destinationPath
+            Move-Item -LiteralPath $tmpPath -Destination $destinationPath -Force
         }
 
         [System.Windows.Forms.MessageBox]::Show(
@@ -224,7 +227,7 @@ $ui.buttonT.Add_Click({
         )
     } 
     else {
-        Remove-Item -Force $tmpPath -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath $tmpPath -Force -ErrorAction SilentlyContinue
         
         [System.Windows.Forms.MessageBox]::Show(
             "Something went wrong. FFmpeg failed with code $($LASTEXITCODE)",

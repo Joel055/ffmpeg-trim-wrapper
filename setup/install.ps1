@@ -10,26 +10,31 @@ if (-Not $principal.IsInRole([Security.Principal.WindowsBuiltinRole]::Administra
     exit 0
 }
 
-if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
-    $dwn = Read-Host "`nffmpeg not found, install binary from winget(Y/N)"
+if (
+    -not (Get-Command ffmpeg  -ErrorAction SilentlyContinue) -or
+    -not (Get-Command ffprobe -ErrorAction SilentlyContinue)
+) { 
+    $dwn = Read-Host "`nffmpeg/ffprobe not found, install via winget (Y/N)"
 
     if ($dwn.ToLower() -eq "y"){
         if (-not (Get-Command winget -ErrorAction SilentlyContinue)){
-            Write-Host "`nERROR: Winget not found, install ffmpeg manually." -ForegroundColor DarkRed
+            Write-Host "`nERROR: Winget not found, install ffmpeg manually.`n" -ForegroundColor DarkRed
+            Pause
             exit 0
         }
         
-        try {
-            Write-Host "`nDownloading and installing ffmpeg..." -ForegroundColor Cyan
-            winget.exe install --id "Gyan.FFmpeg.Essentials" --exact --accept-package-agreements --accept-source-agreements | Out-Null
-        }
-        catch {
-            Write-Host "`nffmpeg installation failed." -ForegroundColor Red
+        Write-Host "`nDownloading and installing ffmpeg..." -ForegroundColor Cyan
+        winget.exe install --id "Gyan.FFmpeg.Essentials" --exact --accept-package-agreements --accept-source-agreements --source winget | Out-Null
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "`nERROR: ffmpeg installation failed.`n" -ForegroundColor Red
+            Pause
             exit 0
         }
     }
     else {
-        Write-Host "Install ffmpeg manually, and re-run the install-file." -ForegroundColor DarkRed
+        Write-Host "Install ffmpeg manually, and re-run the install-file.`n" -ForegroundColor Yellow
+        Pause
         exit 0
     }
 }
@@ -56,7 +61,7 @@ $mediaExts = @(
 
 # Create an install-directory
 New-Item -ItemType Directory -Path $dir -Force | Out-Null
-Copy-Item -Path $PSScriptRoot\app\* -Destination $dir -Force
+Copy-Item -Path $PSScriptRoot\..\app\* -Destination $dir -Force
 
 # Create context-menu keys for each extension
 foreach ($ext in $mediaExts) {
